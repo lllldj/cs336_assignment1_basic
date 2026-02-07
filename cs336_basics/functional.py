@@ -260,7 +260,7 @@ def my_run_train_bpe(
         #print(f"Token {idx_now} , pair {pair}", end="\r")
         
     v, m = build_vocab_and_merges_from_tokens(tokens)
-    tk_id = merge_ops + 256
+    tk_id = 
     for tk in special_tokens:
         v[tk_id] = tk.encode("utf-8")
         tk_id += 1
