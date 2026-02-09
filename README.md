@@ -1,6 +1,6 @@
 # Assignment 1:
-test_train_bpe: Pass
-test_tokenizer: DOING
+test_train_bpe: Pass But need to optimize
+test_tokenizer: Almost Pass, Need to optimize 
 
 
 # CS336 Spring 2025 Assignment 1: Basics

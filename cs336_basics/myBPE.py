@@ -145,11 +145,16 @@ def my_train_bpe(filepath,vocab_size,special_tokens,PAT,num_processes=4):
 class myTokenizer:
     def __init__(self, vocab, merges, pattern,special_tokens=None) -> None:
         self.vocab = vocab
-        self.merges = merges
         self.special_tokens = special_tokens #str
-        self.pattern = pattern
         self.tk_to_id = {token:id for id,token in vocab.items()}  #bytes
         self.byte_id = [self.tk_to_id[bytes([i])] for i in range(256)]
+        self.merges_ids = []
+        
+        for m1,m2 in merges:
+            id1 = self.tk_to_id[m1]
+            id2 = self.tk_to_id[m2]
+            id_m = self.tk_to_id[m1+m2]
+            self.merges_ids.append((id1,id2,id_m))
         #initial for special tokens
         if special_tokens:
             id_allo = max(id for id in self.vocab) + 1
@@ -166,6 +171,7 @@ class myTokenizer:
         else:
             special_pat = None
         self.special_re = re.compile(f"({special_pat})") if special_pat else None
+        self.sentence_re = re.compile(pattern)
         
     def encode(self, text):
         chunk_set = [s for s in self.special_re.split(text) if s] if self.special_re else [text]
@@ -173,26 +179,30 @@ class myTokenizer:
         token_seq = []
         for small_chunk in chunk_set:
             if self.special_tokens and (small_chunk in self.special_tokens):
-                text_seq += [small_chunk]
+                text_seq.append(small_chunk)
             else:
-                text_seq += re.findall(self.pattern, small_chunk)
+                text_seq.extend(self.sentence_re.findall(small_chunk))
         for small_text in text_seq:
             if self.special_tokens and small_text in self.special_tokens:
-                token_seq += [self.tk_to_id[small_text.encode("utf-8")]]
+                token_seq.append(self.tk_to_id[small_text.encode("utf-8")])
                 continue
             btext_list = [self.byte_id[x] for x in small_text.encode("utf-8")]
-            for m1,m2 in self.merges:
+            pair_exist = set(zip(btext_list[:-1],btext_list[1:]))
+            for m1,m2,mm in self.merges_ids:
+                if (m1,m2) not in pair_exist:
+                    continue
                 _ = 0
                 btext_new = []
                 while(_ < len(btext_list)):
-                    if _ + 1 < len(btext_list) and btext_list[_] == self.tk_to_id[m1] and btext_list[_+1] == self.tk_to_id[m2]:
-                        btext_new.append(self.tk_to_id[m1+m2])
+                    if _ + 1 < len(btext_list) and btext_list[_] == m1 and btext_list[_+1] == m2:
+                        btext_new.append(mm)
                         _ += 2
                     else:
                         btext_new.append(btext_list[_])
                         _ += 1
                 btext_list = btext_new
-            token_seq += btext_list  
+                pair_exist = set(zip(btext_list[:-1],btext_list[1:]))
+            token_seq.extend(btext_list)  
         return token_seq
     def encode_iterable(self, iterable):
         for text in iterable:
@@ -200,11 +210,5 @@ class myTokenizer:
             for id in ids:
                 yield id
     def decode(self, ids:list[int]):
-        res = b''
-        for id in ids:
-            if type(id) == list:
-               pass
-            else: 
-                res += self.vocab[id]
-        res = res.decode("utf-8",errors="ignore")
-        return res 
+        res = b"".join(self.vocab[i] for i in ids)
+        return res.decode("utf-8", errors="ignore")
