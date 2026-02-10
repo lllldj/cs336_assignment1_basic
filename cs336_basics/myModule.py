@@ -89,3 +89,33 @@ class toy_SwiGLU(nn.Module):
         W1x = x @ self.W1.T
         Slu = W1x * torch.sigmoid(W1x)
         return (Slu * W3x)@self.W2.T
+    
+    
+class toy_RoPE(nn.Module):
+    def __init__(self, d_k, theta, max_len, device = None, dtype = torch.float32):
+        super().__init__()
+        
+        self.rot_d = d_k//2
+        i = torch.arange(self.rot_d, device=device, dtype=dtype)         
+        j = torch.arange(max_len, device=device, dtype=dtype)      
+
+        inv_freq = torch.exp(-(2*i)/d_k * torch.log(torch.tensor(theta, device=device, dtype=dtype)))                   
+        thetas = j[:, None] * inv_freq[None, :]  
+        
+        cos_table = torch.cos(thetas)  #cos_table [token posistion, feature posistion]
+        sin_table = torch.sin(thetas)
+        
+        self.register_buffer("cos_table",cos_table,persistent=False)
+        self.register_buffer("sin_table",sin_table,persistent=False)
+    
+    def forward(self,x,tk_posistions):
+        cos = self.cos_table[tk_posistions] #(T,d/2)
+        sin = self.sin_table[tk_posistions] #(T,d/2)
+        x_rot = x[..., :2*self.rot_d]
+        x_pass = x[..., 2*self.rot_d:]
+        x1 = x_rot[...,0::2] #(T,d/2 + 1) ?
+        x2 = x_rot[...,1::2]
+        y1 = x1 * cos - x2 * sin
+        y2 = x1 * sin + x2 * cos
+        y_rot = torch.stack([y1, y2], dim=-1).flatten(-2)
+        return torch.cat([y_rot, x_pass], dim=-1)

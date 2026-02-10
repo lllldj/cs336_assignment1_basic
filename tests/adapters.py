@@ -186,7 +186,7 @@ def run_multihead_self_attention_with_rope(
     """
     raise NotImplementedError
 
-
+from cs336_basics.myModule import toy_RoPE
 def run_rope(
     d_k: int,
     theta: float,
@@ -206,7 +206,9 @@ def run_rope(
     Returns:
         Float[Tensor, " ... sequence_length d_k"]: Tensor with RoPEd input.
     """
-    raise NotImplementedError
+    Ro = toy_RoPE(d_k,theta,max_seq_len)
+    return Ro.forward(in_query_or_key,token_positions)
+    #raise NotImplementedError
 
 
 def run_transformer_block(
