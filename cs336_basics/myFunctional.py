@@ -14,3 +14,4 @@ def toy_product_atte(Q, K, V, mask=None):
         Qk = Qk.masked_fill(mask==False,float('-inf'))
     sQk = toy_softmax(Qk)
     return sQk @ V
+
