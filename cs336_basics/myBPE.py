@@ -142,6 +142,8 @@ def my_train_bpe(filepath,vocab_size,special_tokens,PAT,num_processes=4):
     return token_dict, merge_list
 
 
+import heapq
+
 class myTokenizer:
     def __init__(self, vocab, merges, pattern,special_tokens=None) -> None:
         self.vocab = vocab
