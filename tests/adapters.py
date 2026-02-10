@@ -9,7 +9,7 @@ import torch
 from jaxtyping import Bool, Float, Int
 from torch import Tensor
 
-
+from cs336_basics.myModule import toy_Liner
 def run_linear(
     d_in: int,
     d_out: int,
@@ -28,10 +28,12 @@ def run_linear(
     Returns:
         Float[Tensor, "... d_out"]: The transformed output of your linear module.
     """
+    l = toy_Liner(d_in,d_out)
+    l.set_weights(weights)
+    #raise NotImplementedError
+    return l.forward(in_features)
 
-    raise NotImplementedError
-
-
+from cs336_basics.myModule import toy_Embedding
 def run_embedding(
     vocab_size: int,
     d_model: int,
@@ -50,9 +52,10 @@ def run_embedding(
     Returns:
         Float[Tensor, "... d_model"]: Batch of embeddings returned by your Embedding layer.
     """
-
-    raise NotImplementedError
-
+    E = toy_Embedding(vocab_size,d_model)
+    E.set_embd(weights)
+    #raise NotImplementedError
+    return E.forward(token_ids)
 
 def run_swiglu(
     d_model: int,
@@ -357,7 +360,6 @@ def run_transformer_lm(
     """
     raise NotImplementedError
 
-
 def run_rmsnorm(
     d_model: int,
     eps: float,
@@ -538,7 +540,7 @@ def run_load_checkpoint(
     """
     raise NotImplementedError
 
-from cs336_basics.myBPE import myTokenizer
+from cs336_basics.myBPE import toy_Tokenizer
 def get_tokenizer(
     vocab: dict[int, bytes],
     merges: list[tuple[bytes, bytes]],
@@ -561,9 +563,9 @@ def get_tokenizer(
     """
     PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
     #raise NotImplementedError
-    return myTokenizer(vocab,merges,PAT,special_tokens)
+    return toy_Tokenizer(vocab,merges,PAT,special_tokens)
 
-from cs336_basics.myBPE import my_train_bpe
+from cs336_basics.myBPE import toy_train_bpe
 def run_train_bpe(
     input_path: str | os.PathLike,
     vocab_size: int,
@@ -593,4 +595,4 @@ def run_train_bpe(
     """
     PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
     #raise NotImplementedError
-    return my_train_bpe(input_path,vocab_size,special_tokens,PAT)
+    return toy_train_bpe(input_path,vocab_size,special_tokens,PAT)

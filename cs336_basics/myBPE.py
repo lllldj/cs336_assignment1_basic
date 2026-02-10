@@ -124,7 +124,7 @@ def merge_operation(_seq_weights, merge_pair, merge_id):
         _seq_weights_copy[new_k] = _seq_weights_copy.get(new_k,0)+v
     return _seq_weights_copy
 
-def my_train_bpe(filepath,vocab_size,special_tokens,PAT,num_processes=4):
+def toy_train_bpe(filepath,vocab_size,special_tokens,PAT,num_processes=4):
     token_dict = {i:bytes([i]) for i in range(256)}
     merge_list = []
     seq_now = build_seq_weights(filepath,num_processes,special_tokens,PAT)
@@ -144,7 +144,7 @@ def my_train_bpe(filepath,vocab_size,special_tokens,PAT,num_processes=4):
 
 import heapq
 
-class myTokenizer:
+class toy_Tokenizer:
     def __init__(self, vocab, merges, pattern,special_tokens=None) -> None:
         self.vocab = vocab
         self.special_tokens = special_tokens #str
