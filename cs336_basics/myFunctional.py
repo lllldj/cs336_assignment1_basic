@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import os
+import random
+import numpy as np
 
 def toy_softmax(x):
     sx = x -  x.max(-1,keepdim=True).values
@@ -54,4 +56,10 @@ def toy_grad_clip(parameters,max_l2_norm):
             if p.grad is not None:
                 p.grad.mul_(scale)
     return
+
+def get_batch_from_data(dataset, batch_size, context_len, device):
+    sts = [random.randint(0,len(dataset)-context_len-1) for _ in range(batch_size)]
+    data_load = np.array([dataset[st:st+context_len] for st in sts])
+    target = np.array([dataset[st+1:st+context_len+1] for st in sts])
+    return torch.tensor(data_load,device=device),torch.tensor(target,device=device)
             
