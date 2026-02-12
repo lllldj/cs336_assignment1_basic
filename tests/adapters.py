@@ -525,7 +525,7 @@ def run_get_lr_cosine_schedule(
     #raise NotImplementedError
     return cosine_warm_up_lr(it,max_learning_rate,min_learning_rate,warmup_iters,cosine_cycle_iters)
 
-
+from cs336_basics.myFunctional import save_check_point
 def run_save_checkpoint(
     model: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
@@ -542,9 +542,10 @@ def run_save_checkpoint(
             we've completed.
         out (str | os.PathLike | BinaryIO | IO[bytes]): Path or file-like object to serialize the model, optimizer, and iteration to.
     """
-    raise NotImplementedError
+    #raise NotImplementedError
+    return save_check_point(model,optimizer,iteration,out)
 
-
+from cs336_basics.myFunctional import load_check_point
 def run_load_checkpoint(
     src: str | os.PathLike | BinaryIO | IO[bytes],
     model: torch.nn.Module,
@@ -563,7 +564,8 @@ def run_load_checkpoint(
     Returns:
         int: the previously-serialized number of iterations.
     """
-    raise NotImplementedError
+    #raise NotImplementedError
+    return load_check_point(src,model,optimizer)
 
 from cs336_basics.myBPE import toy_Tokenizer
 def get_tokenizer(

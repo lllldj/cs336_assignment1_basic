@@ -62,4 +62,20 @@ def get_batch_from_data(dataset, batch_size, context_len, device):
     data_load = np.array([dataset[st:st+context_len] for st in sts])
     target = np.array([dataset[st+1:st+context_len+1] for st in sts])
     return torch.tensor(data_load,device=device),torch.tensor(target,device=device)
-            
+
+def save_check_point(model, optimizer, iter, filepath):
+    model_state = model.state_dict()
+    opt_state = optimizer.state_dict()
+    data = (model_state,opt_state,iter)
+    out_path = filepath
+    torch.save(data,out_path)
+    return 
+
+def load_check_point(path,model,optimizer):
+    in_path = path
+    data = torch.load(in_path)
+    model_state = data[0]
+    opt_state = data[1]
+    model.load_state_dict(model_state)
+    optimizer.load_state_dict(opt_state)
+    return data[2]
